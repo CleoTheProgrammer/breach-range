@@ -3,7 +3,7 @@ require_once __DIR__ . '/helpers.php';
 $P = require_player();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: /challenges.php'); exit; }
 $v = $_POST['v'] ?? '';
-$H = hints();
+$H = hints() + hints_more();
 if (!isset($H[$v])) { header('Location: /challenges.php'); exit; }
 
 $prog = progress_for($P['id']);

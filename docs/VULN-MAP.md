@@ -35,3 +35,17 @@ API calls carry the player key via `?pk=<key>` or header `X-Player-Key`.
 
 ## Seed logins
 tshepo:123456789, lerato:letmein, admin:admin
+
+## Added challenges (now 20 flags, one per OWASP item)
+| id | OWASP | Where / how to capture |
+|----|-------|------------------------|
+| components | Web A06 Vulnerable/Outdated Components | `report.php?tpl={{ 7*7 }}` (SimpleTpl v1.0 SSTI via eval); flag on render |
+| authn | Web A07 Auth Failures | Brute-force the `driver` account (password = `password`, no lockout); flag on dashboard |
+| logging | Web A09 Logging Failures | `robots.txt` leaks `/logs.php`, an exposed debug log that over-logs secrets; flag in the log |
+| apiauth | API2 Broken Authentication | `GET /api/v1/whoami?token=<token>` (token in URL); `flag` field |
+| apiresource | API4 Unrestricted Resource Consumption | `GET /api/v1/shipments?limit=1000000` (no cap); `flag` field |
+| apiflow | API6 Unrestricted Business Flow | `GET /api/v1/orders/bulk?count=10000` (no qty cap); `flag` field |
+| apimisconfig | API8 Security Misconfiguration | `GET /api/v1/config` (debug endpoint left on); `flag` field |
+
+New seed account: `driver` / `password` (weak, for the A07 brute-force challenge).
+Note: these 7 live on `main`; the `hardened` branch currently remediates the original 13.

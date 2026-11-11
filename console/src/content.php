@@ -146,5 +146,5 @@ function challenges() {
       ['q'=>'Why does effort on v1 not protect v0?','opts'=>['It does','Controls are per endpoint/version; an untracked version inherits none','v0 is encrypted','v0 cannot be reached'],'a'=>1],
     ],
   ],
-  ];
+  ] + challenges_more();
 }
