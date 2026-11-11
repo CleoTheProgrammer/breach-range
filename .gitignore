@@ -1,0 +1,4 @@
+*.log
+.env
+web/src/uploads/*
+!web/src/uploads/.gitkeep

@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# API8 misconfiguration: wide-open CORS, even with credentials.
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Credentials "true"

@@ -1,0 +1,18 @@
+stages: [lint, build]
+
+php-lint:
+  stage: lint
+  image: php:8.2-cli
+  script:
+    - echo "Syntax-checking target + console PHP"
+    - find web/src console/src -name '*.php' -print0 | xargs -0 -n1 php -l
+
+docker-build:
+  stage: build
+  image: docker:27
+  services: [docker:27-dind]
+  script:
+    - docker build -t breach-target ./web
+    - docker build -t breach-console ./console
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
