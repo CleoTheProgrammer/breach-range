@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/content2.php';
 // Content for every challenge: lesson (what / business impact / remediation) and a hard quiz.
 // Keys MUST match the vuln ids the target uses in pf()/cflag().
 function challenges() {
