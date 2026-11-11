@@ -1,36 +1,50 @@
 <?php
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/flags.php';
-// A03 Injection (SQLi) + A07 Auth failures. On a detected auth-bypass we award
-// the per-player sqli flag (we re-check the creds safely; if the vulnerable
-// query let someone in without valid creds, it was an injection).
+// Fixed: parameterised query, generic failure (no enumeration), password_verify
+// with MD5->bcrypt upgrade, AND rate limiting / lockout against brute force (A07).
 $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $u = $_POST['username'] ?? '';
-    $p = $_POST['password'] ?? '';
-    $sql = "SELECT * FROM users WHERE username = '$u' AND password = MD5('$p')"; // vulnerable
-    try {
-        $row = q_raw($sql)->fetch(PDO::FETCH_ASSOC);
+    $now = time();
+    $_SESSION['login_fail'] = array_values(array_filter($_SESSION['login_fail'] ?? [],
+        fn($t) => $t > $now - 900));                       // 15-minute window
+    if (count($_SESSION['login_fail']) >= 5) {
+        $err = 'Too many failed attempts. Please wait before trying again.';
+    } else {
+        $u = $_POST['username'] ?? '';
+        $p = $_POST['password'] ?? '';
+        $stmt = db()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$u]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $ok = false;
         if ($row) {
-            // Safe re-check of the literal credentials supplied.
-            $chk = db()->prepare("SELECT id FROM users WHERE username = ? AND password = MD5(?)");
-            $chk->execute([$u, $p]);
-            if (!$chk->fetch()) { $_SESSION['sqli_flag'] = pf('sqli'); } // creds did not really match -> injection
-            $_SESSION['uid']   = $row['id'];
-            $_SESSION['uname'] = $row['username'];
-            $_SESSION['role']  = $row['role'];
-            $_SESSION['name']  = $row['full_name'];
-            header('Location: /dashboard.php'); exit;
-        } else {
-            $exists = q_raw("SELECT id FROM users WHERE username = '$u'")->fetch();
-            $err = $exists ? 'Incorrect password for that account.' : 'No such username.';
+            $h = $row['password'];
+            if (preg_match('/^[a-f0-9]{32}$/i', $h)) {
+                if (hash_equals(strtolower($h), md5($p))) {
+                    $ok = true;
+                    db()->prepare("UPDATE users SET password = ? WHERE id = ?")
+                        ->execute([password_hash($p, PASSWORD_DEFAULT), $row['id']]);
+                }
+            } else {
+                $ok = password_verify($p, $h);
+            }
         }
-    } catch (Exception $e) { $err = 'Query error: ' . $e->getMessage(); }
+        if ($ok) {
+            unset($_SESSION['login_fail']);
+            session_regenerate_id(true);
+            $_SESSION['uid']  = $row['id'];
+            $_SESSION['uname']= $row['username'];
+            $_SESSION['role'] = $row['role'];
+            $_SESSION['name'] = $row['full_name'];
+            header('Location: /dashboard.php'); exit;
+        }
+        $_SESSION['login_fail'][] = $now;
+        $err = 'Invalid username or password.';
+    }
 }
 require_once __DIR__ . '/includes/header.php'; ?>
 <div class="card" style="max-width:420px;margin:0 auto">
   <h2 style="margin-top:0">Sign in</h2>
-  <?php if ($err): ?><p style="color:#c0392b"><?= $err ?></p><?php endif; ?>
+  <?php if ($err): ?><p style="color:#c0392b"><?= htmlspecialchars($err) ?></p><?php endif; ?>
   <form method="post">
     <label>Username</label><input name="username" autofocus>
     <label>Password</label><input name="password" type="password">

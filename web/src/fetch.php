@@ -1,14 +1,27 @@
 <?php
 require_once __DIR__ . '/db.php';
 if (empty($_SESSION['uid'])) { header('Location: /login.php'); exit; }
-// A10 SSRF: "import from partner URL" fetches any URL server-side with no allow-list.
-// Reaches internal-only endpoints (e.g. http://127.0.0.1/internal.php) and the db host.
-$body = ''; $url = $_GET['url'] ?? '';
-if ($url !== '') {
-    $ctx = stream_context_create(['http' => ['timeout' => 4]]);
+// Fixed SSRF: only http(s), resolve the host and refuse private, loopback,
+// link-local and reserved ranges, and do not follow redirects.
+function safe_fetch($url) {
+    $p = parse_url($url);
+    if (!$p || !in_array(strtolower($p['scheme'] ?? ''), ['http','https'], true) || empty($p['host'])) {
+        return '[rejected: only http(s) URLs are allowed]';
+    }
+    $ips = @gethostbynamel($p['host']);
+    if (!$ips) return '[rejected: host did not resolve]';
+    foreach ($ips as $ip) {
+        if (!filter_var($ip, FILTER_VALIDATE_IP,
+              FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return '[rejected: destination resolves to a private or reserved address]';
+        }
+    }
+    $ctx = stream_context_create(['http' => ['timeout' => 4, 'max_redirects' => 0, 'follow_location' => 0]]);
     $body = @file_get_contents($url, false, $ctx);
-    if ($body === false) { $body = '[fetch failed]'; }
+    return $body === false ? '[fetch failed]' : $body;
 }
+$body = ''; $url = $_GET['url'] ?? '';
+if ($url !== '') { $body = safe_fetch($url); }
 require_once __DIR__ . '/includes/header.php'; ?>
 <div class="card">
   <h2 style="margin-top:0">Import partner manifest</h2>

@@ -1,35 +1,17 @@
-# Breach Range (Stage 1): target + console + shared db.
-# ISOLATED TRAINING LAB ONLY. Do not expose to any untrusted network.
+# Hardened branch: the fixed target only, for diffing against main and confirming
+# the Stage 1 exploits no longer work. No console (nothing to capture here).
 services:
   target:
     build: ./web
-    container_name: kestrel_target
+    container_name: kestrel_target_hardened
     ports:
       - "127.0.0.1:8080:80"
     environment:
       DB_HOST: db
       DB_NAME: kestrel
       DB_USER: kestrel_app
-      DB_PASS: Summer2023!        # intentionally weak, part of the scenario
+      DB_PASS: Summer2023!
       APP_STAGE: "1"
-      FLAG_PEPPER: "kestrel-stage1-pepper-change-me"   # shared with console, NOT given to players
-    depends_on:
-      db:
-        condition: service_healthy
-    networks: [range]
-
-  console:
-    build: ./console
-    container_name: range_console
-    ports:
-      - "127.0.0.1:8081:80"
-    environment:
-      DB_HOST: db
-      DB_NAME: console
-      DB_USER: console_app
-      DB_PASS: console-strong-pw
-      TARGET_URL: "http://127.0.0.1:8080"
-      FLAG_PEPPER: "kestrel-stage1-pepper-change-me"   # must match target
     depends_on:
       db:
         condition: service_healthy
@@ -37,12 +19,11 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: range_db
+    container_name: kestrel_db_hardened
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - ./db/00-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
-      - ./db/10-console.sql:/docker-entrypoint-initdb.d/10-console.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 5s

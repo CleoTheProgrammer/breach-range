@@ -1,15 +1,20 @@
 <?php
 require_once __DIR__ . '/db.php';
 if (empty($_SESSION['uid'])) { header('Location: /login.php'); exit; }
-// A01/RCE: profile photo upload with no type, extension or content validation,
-// written into a directory that executes PHP. Drop a .php webshell -> code execution.
+// Fixed: verify the file really is an image, allow only jpg/png, store under a
+// random name. The uploads directory no longer executes code (Apache + Dockerfile),
+// so an uploaded script cannot run.
 $out = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['photo']['name'])) {
-    $name = basename($_FILES['photo']['name']);          // attacker-controlled name/ext
-    $dest = __DIR__ . '/uploads/' . $name;
-    if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
-        $out = 'Uploaded to /uploads/' . htmlspecialchars($name);
-    } else { $out = 'Upload failed.'; }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['photo']['tmp_name'])) {
+    $info = @getimagesize($_FILES['photo']['tmp_name']);
+    $allowed = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png'];
+    if ($info && isset($allowed[$info[2]])) {
+        $name = bin2hex(random_bytes(8)) . '.' . $allowed[$info[2]];
+        move_uploaded_file($_FILES['photo']['tmp_name'], __DIR__ . '/uploads/' . $name);
+        $out = 'Uploaded.';
+    } else {
+        $out = 'Rejected: only JPG or PNG images are accepted.';
+    }
 }
 require_once __DIR__ . '/includes/header.php'; ?>
 <div class="card" style="max-width:480px">
@@ -18,7 +23,6 @@ require_once __DIR__ . '/includes/header.php'; ?>
     <input type="file" name="photo">
     <button class="btn amber" type="submit">Upload</button>
   </form>
-  <?php if ($out): ?><p><?= $out ?></p><?php endif; ?>
-  <p style="font-size:12px;color:#8296a8">Accepted: JPG or PNG, up to 20&nbsp;MB.</p>
+  <?php if ($out): ?><p><?= htmlspecialchars($out) ?></p><?php endif; ?>
 </div>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
