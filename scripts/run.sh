@@ -34,7 +34,7 @@ case "${1:-up}" in
     fi
     TARGET_PORT="$(ask 'Target port'  8080 TARGET_PORT)"
     CONSOLE_PORT="$(ask 'Console port' 8081 CONSOLE_PORT)"
-    PUBLIC_HOST="$(ask 'Public IP to give students' "$DEF_IP" PUBLIC_HOST)"
+    PUBLIC_HOST="$(ask 'Public IP' "$DEF_IP" PUBLIC_HOST)"
     export BIND_HOST="${BIND_HOST:-0.0.0.0}" INSTRUCTOR_PASSWORD AUDIT_SECRET TARGET_PORT CONSOLE_PORT PUBLIC_HOST
     docker compose up --build -d
     echo
