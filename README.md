@@ -26,10 +26,15 @@ Flags are FLAG{vuln_HMAC(your_key + secret_pepper)}, so they cannot be shared or
 Submitting someone else's flag is detected and rejected.
 
 ## Run it (Docker)
+Use the helper so it prompts you for host ports (defaults 8080/8081), handy when a port is taken:
 ```bash
-docker compose up --build -d
+./scripts/run.sh up
 ```
-Console http://127.0.0.1:8081 (start here), target http://127.0.0.1:8080.
+Or run compose directly, overriding ports as needed:
+```bash
+TARGET_PORT=8080 CONSOLE_PORT=8081 docker compose up --build -d
+```
+Console is the console port (start here), target is the target port, both on 127.0.0.1.
 Tear down and wipe data: `docker compose down -v`.
 
 Target seed logins (for the scenario): tshepo:123456789, lerato:letmein, admin:admin.
