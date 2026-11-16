@@ -27,10 +27,15 @@ case "${1:-up}" in
       INSTRUCTOR_PASSWORD='change-me-instructor'
       echo "  (no password entered, using the default 'change-me-instructor', change it next time)"
     fi
+    AUDIT_SECRET="$(ask_secret 'Audit log secret (keeps the audit chain tamper-proof)' AUDIT_SECRET)"
+    if [ -z "$AUDIT_SECRET" ]; then
+      AUDIT_SECRET='change-me-audit-secret'
+      echo "  (no audit secret entered, using the default, change it next time)"
+    fi
     TARGET_PORT="$(ask 'Target port'  8080 TARGET_PORT)"
     CONSOLE_PORT="$(ask 'Console port' 8081 CONSOLE_PORT)"
     PUBLIC_HOST="$(ask 'Public IP to give students' "$DEF_IP" PUBLIC_HOST)"
-    export BIND_HOST="${BIND_HOST:-0.0.0.0}" INSTRUCTOR_PASSWORD TARGET_PORT CONSOLE_PORT PUBLIC_HOST
+    export BIND_HOST="${BIND_HOST:-0.0.0.0}" INSTRUCTOR_PASSWORD AUDIT_SECRET TARGET_PORT CONSOLE_PORT PUBLIC_HOST
     docker compose up --build -d
     echo
     echo "=============================================================="
