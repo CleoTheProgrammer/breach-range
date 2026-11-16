@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/helpers.php';
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: /index.php'); exit; }
 
 // Suggest a free handle based on what they tried.
@@ -29,12 +29,14 @@ if ($p) {
     // Correct passphrase = the owner resuming their own session.
     if (password_verify($pw, $p['pass_hash'])) {
         $_SESSION['pid'] = $p['id'];
+        audit('login', '', $p['id'], $handle);
         header('Location: /challenges.php'); exit;
     }
     // Otherwise the name is taken: block it and suggest a free one, let them retry.
     $suggestion = suggest_handle($handle);
     $_SESSION['suggested_handle'] = $suggestion;
     $_SESSION['flash'] = ['err', 'You cannot use this username, it is already taken. Try "' . $suggestion . '", or choose another.'];
+    audit('handle_blocked', 'tried=' . $handle, null, $handle);
     header('Location: /index.php'); exit;
 }
 
@@ -43,6 +45,7 @@ $key = bin2hex(random_bytes(16));
 $ins = db()->prepare("INSERT INTO players (handle, pass_hash, player_key) VALUES (?,?,?)");
 $ins->execute([$handle, password_hash($pw, PASSWORD_DEFAULT), $key]);
 $_SESSION['pid'] = db()->lastInsertId();
+audit('register', 'handle=' . $handle, (int)$_SESSION['pid'], $handle);
 $_SESSION['flash'] = ['ok', 'Operator ' . $handle . ' enlisted. Launch the target and start hunting.'];
 header('Location: /challenges.php');
 exit;

@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              VALUES (?,?,NOW(),1,NOW())
              ON DUPLICATE KEY UPDATE quiz_passed = 1, quiz_at = NOW()");
         $up->execute([$P['id'], $v]);
+        audit('quiz_pass', 'vuln=' . $v);
         $_SESSION['flash'] = ['ok', 'Passed, all correct (+' . PTS_QUIZ . ').'];
         header('Location: /challenges.php'); exit;
     }

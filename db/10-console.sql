@@ -19,3 +19,18 @@ CREATE TABLE progress (
   hint_used TINYINT DEFAULT 0,
   UNIQUE KEY uniq_player_vuln (player_id, vuln_id)
 );
+
+-- Non-repudiation: append-only, hash-chained audit log. Each row is HMAC'd over the
+-- previous row's hash plus its own fields, so any edit or deletion breaks the chain
+-- and is detectable, and the chain cannot be forged without AUDIT_SECRET.
+CREATE TABLE audit (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  player_id INT NULL,
+  handle VARCHAR(40),
+  action VARCHAR(40),
+  detail VARCHAR(255),
+  ip VARCHAR(45),
+  prev_hash CHAR(64),
+  row_hash CHAR(64)
+);

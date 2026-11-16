@@ -8,6 +8,7 @@ if (empty($_SESSION['instructor'])) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (hash_equals(INSTRUCTOR_PASSWORD, $_POST['instructor_pw'] ?? '')) {
             $_SESSION['instructor'] = true;
+            audit('instructor_login', '', null, 'INSTRUCTOR');
             header('Location: /rebonametlholofa.php'); exit;
         }
         $err = 'Incorrect instructor password.';
@@ -27,6 +28,7 @@ if (empty($_SESSION['instructor'])) {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_vis'])) {
     set_challenges_visible($_POST['set_vis'] === '1');
+    audit('visibility', 'set=' . ($_POST['set_vis'] === '1' ? 'show' : 'hide'), null, 'INSTRUCTOR');
     header('Location: /rebonametlholofa.php'); exit;
 }
 $challenges_shown = challenges_visible();

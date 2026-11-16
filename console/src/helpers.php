@@ -86,3 +86,35 @@ function challenges_visible() {
     return trim((string)@file_get_contents($p)) !== '0';
 }
 function set_challenges_visible($on) { @file_put_contents(state_path(), $on ? '1' : '0'); }
+
+// ---- Non-repudiation audit log (append-only, HMAC hash chain) ----------------
+define('AUDIT_GENESIS', str_repeat('0', 64));
+function audit_secret() { return getenv('AUDIT_SECRET') ?: 'change-me-audit-secret'; }
+function audit($action, $detail = '', $player_id = null, $handle = null) {
+    try {
+        if ($player_id === null && !empty($_SESSION['pid'])) $player_id = (int)$_SESSION['pid'];
+        if ($handle === null) { $p = (!empty($_SESSION['pid'])) ? current_player() : null; $handle = $p['handle'] ?? ''; }
+        $detail = substr((string)$detail, 0, 255);
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $ts = date('Y-m-d H:i:s');
+        $prev = db()->query("SELECT row_hash FROM audit ORDER BY id DESC LIMIT 1")->fetchColumn();
+        if (!$prev) $prev = AUDIT_GENESIS;
+        $canon = $prev.'|'.$ts.'|'.(int)$player_id.'|'.$handle.'|'.$action.'|'.$detail.'|'.$ip;
+        $row_hash = hash_hmac('sha256', $canon, audit_secret());
+        db()->prepare("INSERT INTO audit (ts,player_id,handle,action,detail,ip,prev_hash,row_hash) VALUES (?,?,?,?,?,?,?,?)")
+            ->execute([$ts, $player_id ?: null, $handle, $action, $detail, $ip, $prev, $row_hash]);
+    } catch (Throwable $e) { /* never break the app over audit logging */ }
+}
+function audit_verify() {
+    $rows = db()->query("SELECT * FROM audit ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $prev = AUDIT_GENESIS;
+    foreach ($rows as $r) {
+        $canon = $prev.'|'.$r['ts'].'|'.(int)$r['player_id'].'|'.$r['handle'].'|'.$r['action'].'|'.$r['detail'].'|'.(string)$r['ip'];
+        $calc = hash_hmac('sha256', $canon, audit_secret());
+        if (!hash_equals((string)$r['prev_hash'], $prev) || !hash_equals((string)$r['row_hash'], $calc)) {
+            return ['ok' => false, 'bad' => (int)$r['id'], 'count' => count($rows)];
+        }
+        $prev = $r['row_hash'];
+    }
+    return ['ok' => true, 'bad' => null, 'count' => count($rows)];
+}

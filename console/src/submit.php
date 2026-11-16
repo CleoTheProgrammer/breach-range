@@ -17,6 +17,7 @@ if ($match === null) {
     } else {
         $_SESSION['flash'] = ['err', 'Not a valid flag.'];
     }
+    audit('flag_reject', 'submitted=' . substr($submitted, 0, 60));
     header('Location: /challenges.php'); exit;
 }
 
@@ -28,6 +29,7 @@ if (!empty($prog[$match]['flag'])) {
         "INSERT INTO progress (player_id, vuln_id, flag_at) VALUES (?,?,NOW())
          ON DUPLICATE KEY UPDATE flag_at = NOW()");
     $up->execute([$P['id'], $match]);
+    audit('flag_capture', 'vuln=' . $match);
     $_SESSION['flash'] = ['ok', 'Flag accepted (+' . PTS_FLAG . '). Now the debrief.'];
 }
 header('Location: /lesson.php?v=' . $match);

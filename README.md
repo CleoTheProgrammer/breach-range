@@ -99,7 +99,17 @@ INSTRUCTOR_PASSWORD='your-secret' ./scripts/run.sh up
 Then open `http://<ip>:<console-port>/rebonametlholofa.php`, enter the password once, and use the
 `lock` link to drop access again. Change `INSTRUCTOR_PASSWORD` from its default before hosting.
 
+### Audit log, non-repudiation (instructor-only)
+Every scoring action (register, login, blocked-handle attempt, flag submit and result, quiz pass,
+hint use, and instructor actions) is written to an append-only audit log, each entry HMAC-chained to
+the previous one with `AUDIT_SECRET`. Any edit or deletion breaks the chain and is flagged, and the
+chain cannot be forged without the secret. View it at `/audit.php` (instructor-only, shown as "Audit"
+in the nav once unlocked); the top banner says whether the chain is intact or where it was tampered.
+The audit table is created at DB init, so if you added this to an existing instance, recreate the DB
+with `docker compose down -v` once. Set a real `AUDIT_SECRET` and keep it private.
+
 ### Env vars
 `TARGET_PORT`, `CONSOLE_PORT` (host ports), `PUBLIC_HOST` (IP in the console's launch links),
 `BIND_HOST` (default `0.0.0.0`; set `127.0.0.1` to go back to local-only), `INSTRUCTOR_PASSWORD`,
+`AUDIT_SECRET` (keys the tamper-evident audit chain; change it),
 `FLAG_PEPPER` (change before an event).

@@ -16,6 +16,7 @@ $up = db()->prepare(
     "INSERT INTO progress (player_id, vuln_id, hint_used) VALUES (?,?,1)
      ON DUPLICATE KEY UPDATE hint_used = 1");
 $up->execute([$P['id'], $v]);
+audit('hint_used', 'vuln=' . $v);
 $_SESSION['flash'] = ['ok', 'Hint (-' . HINT_COST . '): ' . $H[$v]];
 header('Location: /challenges.php');
 exit;
