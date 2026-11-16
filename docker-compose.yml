@@ -7,6 +7,7 @@ services:
     ports:
       - "${BIND_HOST:-0.0.0.0}:${TARGET_PORT:-8080}:80"
     environment:
+      TZ: "Africa/Johannesburg"
       DB_HOST: db
       DB_NAME: kestrel
       DB_USER: kestrel_app
@@ -24,6 +25,7 @@ services:
     ports:
       - "${BIND_HOST:-0.0.0.0}:${CONSOLE_PORT:-8081}:80"
     environment:
+      TZ: "Africa/Johannesburg"
       DB_HOST: db
       DB_NAME: console
       DB_USER: console_app
@@ -39,8 +41,10 @@ services:
 
   db:
     image: mysql:8.0
+    command: --default-time-zone=+02:00
     container_name: range_db
     environment:
+      TZ: "Africa/Johannesburg"
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - ./db/00-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro

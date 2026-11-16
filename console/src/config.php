@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set('Africa/Johannesburg');
 define('DB_HOST', getenv('DB_HOST') ?: 'db');
 define('DB_NAME', getenv('DB_NAME') ?: 'console');
 define('DB_USER', getenv('DB_USER') ?: 'console_app');
