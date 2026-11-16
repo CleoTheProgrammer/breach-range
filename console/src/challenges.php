@@ -51,7 +51,11 @@ require_once __DIR__ . '/includes/header.php'; ?>
 </div>
 
 <div class="panel">
-  <h3 style="margin-top:0">Challenges</h3>
+  <div style="display:flex;align-items:center;gap:12px">
+    <h3 style="margin:0">Challenges</h3>
+    <button type="button" id="chalToggle" class="btn ghost" style="margin-left:auto;padding:4px 12px;font-size:12px">hide</button>
+  </div>
+  <div id="chalBody">
   <table>
     <tr><th>Challenge</th><th>Classification</th><th>Surface</th><th>Status</th><th>Pts</th><th></th></tr>
     <?php foreach ($C as $id => $c):
@@ -80,6 +84,17 @@ require_once __DIR__ . '/includes/header.php'; ?>
     </tr>
     <?php endforeach; ?>
   </table>
+  </div>
 </div>
+<script>
+(function(){
+  var k='br_challenges_hidden';
+  var body=document.getElementById('chalBody'), btn=document.getElementById('chalToggle');
+  function apply(h){ body.style.display=h?'none':''; btn.textContent=h?'show challenges':'hide'; }
+  var hidden=false; try{ hidden=localStorage.getItem(k)==='1'; }catch(e){}
+  apply(hidden);
+  btn.addEventListener('click',function(){ hidden=!hidden; try{localStorage.setItem(k,hidden?'1':'0');}catch(e){} apply(hidden); });
+})();
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
