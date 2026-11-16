@@ -48,7 +48,7 @@
     <?php endif; ?>
     <?php if (!empty($_SESSION['instructor'])): ?>
       <a href="/rebonametlholofa.php">Rebonametlholofa</a>
-      <a href="/audit.php">Audit</a>
+      <a href="/tlareboneodirileng.php">Tlareboneodirileng</a>
     <?php endif; ?>
   </nav>
 </header>

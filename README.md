@@ -103,7 +103,7 @@ Then open `http://<ip>:<console-port>/rebonametlholofa.php`, enter the password 
 Every scoring action (register, login, blocked-handle attempt, flag submit and result, quiz pass,
 hint use, and instructor actions) is written to an append-only audit log, each entry HMAC-chained to
 the previous one with `AUDIT_SECRET`. Any edit or deletion breaks the chain and is flagged, and the
-chain cannot be forged without the secret. View it at `/audit.php` (instructor-only, shown as "Audit"
+chain cannot be forged without the secret. View it at `/tlareboneodirileng.php` (instructor-only, shown as "Tlareboneodirileng"
 in the nav once unlocked); the top banner says whether the chain is intact or where it was tampered.
 The audit table is created at DB init, so if you added this to an existing instance, recreate the DB
 with `docker compose down -v` once. Set a real `AUDIT_SECRET` and keep it private.

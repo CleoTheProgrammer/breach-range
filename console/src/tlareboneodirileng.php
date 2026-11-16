@@ -10,7 +10,7 @@ $rows = db()->query("SELECT * FROM audit ORDER BY id DESC LIMIT 500")->fetchAll(
 require_once __DIR__ . '/includes/header.php'; ?>
 <div class="panel">
   <div style="display:flex;align-items:center;gap:12px">
-    <h2 style="margin:0">Audit log</h2>
+    <h2 style="margin:0">Tlareboneodirileng</h2>
     <a href="/rebonametlholofa.php" style="margin-left:auto;font-size:12px">leaderboard</a>
   </div>
   <p style="font-size:13px">
