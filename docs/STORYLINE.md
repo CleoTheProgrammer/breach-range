@@ -63,3 +63,14 @@ Stage 1 now runs as a platform, not just a target:
 - Red herrings and lore breadcrumbs in the target. PARTIAL.
 - Hardened "blue-team" branch to diff exploit vs fix. NEXT.
 - Difficulty dial, hint economy (hints cost points). DONE.
+
+## Stage 2, "Inside the Fence" (built, vertical slice)
+With admin and a shell on the perimeter portal host, you pivot into Kestrel's corporate LAN.
+Three internal services, reachable only from your foothold (a true pivot, nothing is exposed to you):
+- **intranet**: a staff intranet that trusts the LAN and needs no auth (flag `s2_intranet`).
+- **finance**: accepts the password you looted on the perimeter, credential reuse (flag `s2_credreuse`).
+- **secrets**: a deploy/config service whose debug endpoint leaks cloud keys (flag `s2_secrets`), the
+  hook into a future Stage 3 (cloud).
+
+Next for Stage 2: more internal targets (a real DB service, a jump box, the domain controller as the
+final boss), and host-level privilege escalation.

@@ -30,15 +30,28 @@ function points_for($pid) {
     return max(0, $pts);
 }
 
+function challenges_stage($n) {
+    $out = [];
+    foreach (challenges() as $id => $c) { if ((int)($c['stage'] ?? 1) === (int)$n) $out[$id] = $c; }
+    return $out;
+}
+
 function stage1_complete($pid) {
-    $p = progress_for($pid); $need = array_keys(challenges());
+    $p = progress_for($pid); $need = array_keys(challenges_stage(1));
     foreach ($need as $v) { if (empty($p[$v]['flag'])) return false; }
     return true;
 }
 
 function stage1_fullmarks($pid) {
-    $p = progress_for($pid); $need = array_keys(challenges());
+    $p = progress_for($pid); $need = array_keys(challenges_stage(1));
     foreach ($need as $v) { if (empty($p[$v]['flag']) || empty($p[$v]['quiz'])) return false; }
+    return true;
+}
+
+function stage2_complete($pid) {
+    $p = progress_for($pid); $need = array_keys(challenges_stage(2));
+    if (!$need) return false;
+    foreach ($need as $v) { if (empty($p[$v]['flag'])) return false; }
     return true;
 }
 

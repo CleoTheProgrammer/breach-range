@@ -1,10 +1,10 @@
 <?php
 require_once __DIR__ . '/helpers.php';
 $P = require_player();
-$C = challenges();
+$C = challenges_stage(1);
 $prog = progress_for($P['id']);
 $launch = TARGET_URL . '/start.php?pk=' . $P['player_key'];
-$flags_done = count(array_filter($prog, fn($r) => $r['flag']));
+$flags_done = count(array_filter(array_intersect_key($prog, $C), fn($r) => $r['flag']));
 $total_ch = count($C);
 $cleared = stage1_complete($P['id']);
 require_once __DIR__ . '/includes/header.php'; ?>

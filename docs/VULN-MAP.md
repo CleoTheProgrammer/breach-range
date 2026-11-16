@@ -49,3 +49,17 @@ tshepo:123456789, lerato:letmein, admin:admin12345
 
 New seed account: `driver` / `password` (weak, for the A07 brute-force challenge).
 Note: these 7 live on `main`; the `hardened` branch currently remediates the original 13.
+
+## Stage 2, "Inside the Fence" (internal network, reached by pivoting)
+Internal services run on the Docker `corp` network and are NOT published to the host, so they are
+reachable only from the compromised perimeter container (the Stage 1 webshell / reverse shell).
+Pass the player key via header `X-Player-Key` or `?pk=`. Stage 2 unlocks on the console only after
+all Stage 1 flags are captured; submit Stage 2 flags on the console's Stage 2 page.
+
+| id | Theme | Where / how to capture (from the shell on the portal host) |
+|----|-------|------------------------------------------------------------|
+| s2_intranet | Internal network trust | `curl -H 'X-Player-Key: KEY' http://intranet/` (unauth internal dashboard) |
+| s2_credreuse | Credential reuse | `curl -H 'X-Player-Key: KEY' "http://finance/?pw=Summer2023!"` (reuse the leaked Stage 1 DB password) |
+| s2_secrets | Secrets exposure | `curl -H 'X-Player-Key: KEY' "http://secrets/?debug=1"` (env dump leaks cloud creds, sets up Stage 3) |
+
+The intranet page also names the other internal hosts (finance, secrets) as a breadcrumb.

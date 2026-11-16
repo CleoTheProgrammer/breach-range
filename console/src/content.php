@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/content2.php';
+require_once __DIR__ . '/content_s2.php';
 // Content for every challenge: lesson (what / business impact / remediation) and a hard quiz.
 // Keys MUST match the vuln ids the target uses in pf()/cflag().
 function challenges() {
@@ -147,5 +148,5 @@ function challenges() {
       ['q'=>'Why does effort on v1 not protect v0?','opts'=>['It does','Controls are per endpoint/version; an untracked version inherits none','v0 is encrypted','v0 cannot be reached'],'a'=>1],
     ],
   ],
-  ] + challenges_more();
+  ] + challenges_more() + challenges_s2();
 }

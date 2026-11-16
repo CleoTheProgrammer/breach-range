@@ -17,7 +17,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks: [range]
+    networks: [range, corp]
 
   console:
     build: ./console
@@ -56,6 +56,41 @@ services:
       retries: 10
     networks: [range]
 
+  intranet:
+    image: php:8.2-cli
+    container_name: corp_intranet
+    command: php -S 0.0.0.0:80 -t /app
+    volumes:
+      - ./stage2/intranet:/app:ro
+    environment:
+      TZ: "Africa/Johannesburg"
+      FLAG_PEPPER: "kestrel-stage1-pepper-change-me"
+    networks: [corp]
+
+  finance:
+    image: php:8.2-cli
+    container_name: corp_finance
+    command: php -S 0.0.0.0:80 -t /app
+    volumes:
+      - ./stage2/finance:/app:ro
+    environment:
+      TZ: "Africa/Johannesburg"
+      FLAG_PEPPER: "kestrel-stage1-pepper-change-me"
+    networks: [corp]
+
+  secrets:
+    image: php:8.2-cli
+    container_name: corp_secrets
+    command: php -S 0.0.0.0:80 -t /app
+    volumes:
+      - ./stage2/secrets:/app:ro
+    environment:
+      TZ: "Africa/Johannesburg"
+      FLAG_PEPPER: "kestrel-stage1-pepper-change-me"
+    networks: [corp]
+
 networks:
   range:
+    driver: bridge
+  corp:
     driver: bridge
