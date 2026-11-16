@@ -68,3 +68,38 @@ docs/      STORYLINE.md, VULN-MAP.md
 scripts/   run.sh helper
 docker-compose.yml, .gitlab-ci.yml
 ```
+
+## Hosting it for a class (network-reachable)
+The services now publish on all interfaces, so students can reach them by the VM's IP and
+`nmap` the open ports. Run only on an **isolated lab / classroom network**, it is intentionally
+vulnerable.
+
+1. In VirtualBox, give the VM a **Bridged** (or Host-only) adapter so it has a LAN IP students can reach.
+2. Bring it up and let the helper detect the IP and print what to hand out:
+```bash
+./scripts/run.sh up
+```
+   It prompts for the ports and the public IP (defaults to the detected one), then prints the
+   student URLs and the `nmap` target.
+3. If `ufw` is active on the VM, open the ports (the script reminds you):
+```bash
+sudo ufw allow 8080/tcp && sudo ufw allow 8081/tcp
+```
+4. Give students the IP. `nmap <ip>` shows the ports; the **target** is what they attack, the
+   **console** is where they submit flags.
+
+Tip: set the target to port 80 (`Target port: 80` at the prompt) for a more realistic scan.
+
+### Leaderboard is instructor-only
+Students never see the leaderboard, its nav link is hidden and the page is password-gated.
+Set your password on the console service and keep it to yourself:
+```bash
+INSTRUCTOR_PASSWORD='your-secret' ./scripts/run.sh up
+```
+Then open `http://<ip>:<console-port>/leaderboard.php`, enter the password once, and use the
+`lock` link to drop access again. Change `INSTRUCTOR_PASSWORD` from its default before hosting.
+
+### Env vars
+`TARGET_PORT`, `CONSOLE_PORT` (host ports), `PUBLIC_HOST` (IP in the console's launch links),
+`BIND_HOST` (default `0.0.0.0`; set `127.0.0.1` to go back to local-only), `INSTRUCTOR_PASSWORD`,
+`FLAG_PEPPER` (change before an event).

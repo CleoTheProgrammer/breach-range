@@ -5,7 +5,7 @@ services:
     build: ./web
     container_name: kestrel_target
     ports:
-      - "127.0.0.1:${TARGET_PORT:-8080}:80"
+      - "${BIND_HOST:-0.0.0.0}:${TARGET_PORT:-8080}:80"
     environment:
       DB_HOST: db
       DB_NAME: kestrel
@@ -22,14 +22,15 @@ services:
     build: ./console
     container_name: range_console
     ports:
-      - "127.0.0.1:${CONSOLE_PORT:-8081}:80"
+      - "${BIND_HOST:-0.0.0.0}:${CONSOLE_PORT:-8081}:80"
     environment:
       DB_HOST: db
       DB_NAME: console
       DB_USER: console_app
       DB_PASS: console-strong-pw
-      TARGET_URL: "http://127.0.0.1:${TARGET_PORT:-8080}"
+      TARGET_URL: "http://${PUBLIC_HOST:-127.0.0.1}:${TARGET_PORT:-8080}"
       FLAG_PEPPER: "kestrel-stage1-pepper-change-me"   # must match target
+      INSTRUCTOR_PASSWORD: "${INSTRUCTOR_PASSWORD:-change-me-instructor}"
     depends_on:
       db:
         condition: service_healthy

@@ -8,3 +8,4 @@ define('TARGET_URL', getenv('TARGET_URL') ?: 'http://127.0.0.1:8080');
 define('FLAG_PEPPER', getenv('FLAG_PEPPER') ?: 'dev-pepper');
 define('PTS_FLAG', 100);
 define('PTS_QUIZ', 50);
+define('INSTRUCTOR_PASSWORD', getenv('INSTRUCTOR_PASSWORD') ?: 'change-me-instructor');

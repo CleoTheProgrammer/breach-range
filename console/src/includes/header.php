@@ -44,9 +44,9 @@
     <a href="/index.php">Briefing</a>
     <?php if ($P): ?>
       <a href="/challenges.php">Challenges</a>
-      <a href="/leaderboard.php">Leaderboard</a>
       <a href="/logout.php"><?= htmlspecialchars($P['handle']) ?> (exit)</a>
-    <?php else: ?>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['instructor'])): ?>
       <a href="/leaderboard.php">Leaderboard</a>
     <?php endif; ?>
   </nav>
