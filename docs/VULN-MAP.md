@@ -11,7 +11,7 @@ The console recomputes and validates them. Challenge ids below match `pf()`/`cfl
 | idor | Web A01 Broken Access Control | `shipment.php?id=42`; flag in the restricted shipment's notes |
 | privesc | Web A08 / BAC | POST `role=admin` to `profile.php`, then load `admin.php`; flag in the console |
 | xss | Web A03 Injection | Store a `<script>`/`onerror=` payload in `support.php`; flag returned on submit |
-| crypto | Web A02 Cryptographic Failures | Crack MD5 of `admin` (= "admin"), log in as admin, flag on `profile.php` |
+| crypto | Web A02 Cryptographic Failures | Crack MD5 of `admin` (= "admin12345"), log in as admin, flag on `profile.php` |
 | idesign | Web A04 Insecure Design | Reset a password via the guessable 4-digit code in `reset.php`; flag on success |
 | misconfig | Web A05 Misconfiguration | As admin, open `admin.php?diag=1` (phpinfo); flag shown above it |
 | ssrf | Web A10 SSRF | `fetch.php?url=http://127.0.0.1/internal.php`; flag in the internal response |
@@ -34,7 +34,7 @@ API calls carry the player key via `?pk=<key>` or header `X-Player-Key`.
   API9 invapi.
 
 ## Seed logins
-tshepo:123456789, lerato:letmein, admin:admin
+tshepo:123456789, lerato:letmein, admin:admin12345
 
 ## Added challenges (now 20 flags, one per OWASP item)
 | id | OWASP | Where / how to capture |

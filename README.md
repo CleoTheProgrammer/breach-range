@@ -37,7 +37,7 @@ TARGET_PORT=8080 CONSOLE_PORT=8081 docker compose up --build -d
 Console is the console port (start here), target is the target port, both on 127.0.0.1.
 Tear down and wipe data: `docker compose down -v`.
 
-Target seed logins (for the scenario): tshepo:123456789, lerato:letmein, admin:admin.
+Target seed logins (for the scenario): tshepo:123456789, lerato:letmein, admin:admin12345.
 
 ## Workflow: GitLab + Ubuntu VM
 ```bash
