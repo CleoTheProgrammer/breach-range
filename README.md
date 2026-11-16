@@ -90,13 +90,13 @@ sudo ufw allow 8080/tcp && sudo ufw allow 8081/tcp
 
 Tip: set the target to port 80 (`Target port: 80` at the prompt) for a more realistic scan.
 
-### Leaderboard is instructor-only
-Students never see the leaderboard, its nav link is hidden and the page is password-gated.
+### Rebonametlholofa (the leaderboard) is instructor-only
+Students never see the Rebonametlholofa page, its nav link is hidden and it is password-gated.
 Set your password on the console service and keep it to yourself:
 ```bash
 INSTRUCTOR_PASSWORD='your-secret' ./scripts/run.sh up
 ```
-Then open `http://<ip>:<console-port>/leaderboard.php`, enter the password once, and use the
+Then open `http://<ip>:<console-port>/rebonametlholofa.php`, enter the password once, and use the
 `lock` link to drop access again. Change `INSTRUCTOR_PASSWORD` from its default before hosting.
 
 ### Env vars

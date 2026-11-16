@@ -25,7 +25,7 @@ case "${1:-up}" in
     echo " They nmap it and find:   $TARGET_PORT (target), $CONSOLE_PORT (console)"
     echo " Target (attack this):    http://$PUBLIC_HOST:$TARGET_PORT"
     echo " Console (submit flags):  http://$PUBLIC_HOST:$CONSOLE_PORT"
-    echo " Leaderboard (you only):  http://$PUBLIC_HOST:$CONSOLE_PORT/leaderboard.php"
+    echo " Rebonametlholofa (you):  http://$PUBLIC_HOST:$CONSOLE_PORT/rebonametlholofa.php"
     echo "=============================================================="
     if command -v ufw >/dev/null 2>&1 && sudo -n ufw status 2>/dev/null | grep -q "Status: active"; then
       echo " NOTE: ufw is active. Allow the ports:"

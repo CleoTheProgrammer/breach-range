@@ -47,7 +47,7 @@
       <a href="/logout.php"><?= htmlspecialchars($P['handle']) ?> (exit)</a>
     <?php endif; ?>
     <?php if (!empty($_SESSION['instructor'])): ?>
-      <a href="/leaderboard.php">Leaderboard</a>
+      <a href="/rebonametlholofa.php">Rebonametlholofa</a>
     <?php endif; ?>
   </nav>
 </header>
