@@ -68,3 +68,13 @@ function leaderboard() {
     });
     return $rows;
 }
+
+// Instructor-controlled challenge visibility. Shared runtime state (one console
+// container), polled by students so a toggle reaches them within seconds.
+function state_path() { return sys_get_temp_dir() . '/br_challenges_visible'; }
+function challenges_visible() {
+    $p = state_path();
+    if (!is_file($p)) return true;                 // default: shown
+    return trim((string)@file_get_contents($p)) !== '0';
+}
+function set_challenges_visible($on) { @file_put_contents(state_path(), $on ? '1' : '0'); }

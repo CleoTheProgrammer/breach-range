@@ -50,12 +50,12 @@ require_once __DIR__ . '/includes/header.php'; ?>
   </form>
 </div>
 
+<?php $vis = challenges_visible(); ?>
 <div class="panel">
-  <div style="display:flex;align-items:center;gap:12px">
-    <h3 style="margin:0">Challenges</h3>
-    <button type="button" id="chalToggle" class="btn ghost" style="margin-left:auto;padding:4px 12px;font-size:12px">hide</button>
-  </div>
-  <div id="chalBody">
+  <h3 style="margin-top:0">Challenges</h3>
+  <?php if (!$vis): ?>
+    <p style="color:#8aa0b4">The instructor has not released the challenges yet. They will appear here automatically, no need to refresh.</p>
+  <?php else: ?>
   <table>
     <tr><th>Challenge</th><th>Classification</th><th>Surface</th><th>Status</th><th>Pts</th><th></th></tr>
     <?php foreach ($C as $id => $c):
@@ -84,17 +84,17 @@ require_once __DIR__ . '/includes/header.php'; ?>
     </tr>
     <?php endforeach; ?>
   </table>
-  </div>
+  <?php endif; ?>
 </div>
 <script>
 (function(){
-  var k='br_challenges_hidden';
-  var body=document.getElementById('chalBody'), btn=document.getElementById('chalToggle');
-  function apply(h){ body.style.display=h?'none':''; btn.textContent=h?'show challenges':'hide'; }
-  var hidden=false; try{ hidden=localStorage.getItem(k)==='1'; }catch(e){}
-  apply(hidden);
-  btn.addEventListener('click',function(){ hidden=!hidden; try{localStorage.setItem(k,hidden?'1':'0');}catch(e){} apply(hidden); });
+  var cur = <?= $vis ? 'true' : 'false' ?>;
+  setInterval(function(){
+    fetch('/state.php', {cache:'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if (!!d.visible !== cur) location.reload(); })
+      .catch(function(){});
+  }, 3000);
 })();
 </script>
-
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

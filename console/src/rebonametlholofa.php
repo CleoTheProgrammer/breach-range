@@ -25,9 +25,27 @@ if (empty($_SESSION['instructor'])) {
     </div>
     <?php require_once __DIR__ . '/includes/footer.php'; exit;
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_vis'])) {
+    set_challenges_visible($_POST['set_vis'] === '1');
+    header('Location: /rebonametlholofa.php'); exit;
+}
+$challenges_shown = challenges_visible();
 $rows = leaderboard();
 $total = count(challenges()) * (PTS_FLAG + PTS_QUIZ);
 require_once __DIR__ . '/includes/header.php'; ?>
+<div class="panel" style="<?= $challenges_shown ? '' : 'border-color:#f4a400' ?>">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div>
+      <div style="color:#8aa0b4;font-size:12px;letter-spacing:2px;text-transform:uppercase">Challenge visibility</div>
+      <h3 style="margin:4px 0">Challenges are <?= $challenges_shown ? 'SHOWN' : 'HIDDEN' ?> to students</h3>
+    </div>
+    <form method="post" style="margin-left:auto">
+      <input type="hidden" name="set_vis" value="<?= $challenges_shown ? '0' : '1' ?>">
+      <button class="btn" type="submit"><?= $challenges_shown ? 'Hide challenges' : 'Show challenges' ?></button>
+    </form>
+  </div>
+  <p style="color:#8aa0b4;font-size:13px;margin:8px 0 0">Students' pages update within a few seconds, no refresh needed.</p>
+</div>
 <div class="panel">
   <div style="display:flex;align-items:center;gap:12px">
     <h2 style="margin:0">Rebonametlholofa</h2>
