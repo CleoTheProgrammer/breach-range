@@ -35,8 +35,6 @@ require_once __DIR__ . '/includes/header.php'; ?>
     <div style="margin-left:auto">
       <?php if ($cleared): ?>
         <a class="btn" href="/stage2.php">Stage 2 unlocked &rarr;</a>
-      <?php else: ?>
-        <span class="pill todo">Stage 2 locked, capture all flags</span>
       <?php endif; ?>
     </div>
   </div>
