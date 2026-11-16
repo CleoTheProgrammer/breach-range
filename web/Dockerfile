@@ -3,6 +3,9 @@ FROM php:8.2-apache
 # Intentionally old-ish, permissive config for a training target.
 RUN docker-php-ext-install pdo pdo_mysql mysqli
 
+# Basic tooling on the foothold so students can pivot into the internal network (Stage 2).
+RUN apt-get update && apt-get install -y --no-install-recommends curl iproute2 && rm -rf /var/lib/apt/lists/*
+
 # Weak-by-design PHP settings used by several Stage 1 challenges.
 RUN { \
       echo "display_errors = On"; \
