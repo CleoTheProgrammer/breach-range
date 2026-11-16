@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Breach Range helper. Usage: ./scripts/run.sh [up|down|test]
-# `up` prompts for host ports and the public IP so you can hand students one address.
-# Non-interactive? Set TARGET_PORT / CONSOLE_PORT / PUBLIC_HOST in the environment.
+# `up` prompts for the instructor password (Rebonametlholofa / leaderboard page),
+# the host ports, and the public IP, so you can hand students one address.
+# Non-interactive? Set INSTRUCTOR_PASSWORD / TARGET_PORT / CONSOLE_PORT / PUBLIC_HOST
+# in the environment and the matching prompt is skipped.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -11,13 +13,24 @@ ask() {                 # $1=label  $2=default  $3=env var name
   if [ -t 0 ]; then read -rp "$label [$def]: " val; echo "${val:-$def}"; else echo "$def"; fi
 }
 
+ask_secret() {          # $1=label  $2=env var name   (typed input is hidden)
+  local label="$1" var="$2" val
+  if [ -n "${!var:-}" ]; then echo "${!var}"; return; fi
+  if [ -t 0 ]; then read -rsp "$label: " val; echo >&2; echo "$val"; else echo ""; fi
+}
+
 case "${1:-up}" in
   up)
     DEF_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"; [ -n "$DEF_IP" ] || DEF_IP="127.0.0.1"
+    INSTRUCTOR_PASSWORD="$(ask_secret 'Instructor password for the Rebonametlholofa (leaderboard) page' INSTRUCTOR_PASSWORD)"
+    if [ -z "$INSTRUCTOR_PASSWORD" ]; then
+      INSTRUCTOR_PASSWORD='change-me-instructor'
+      echo "  (no password entered, using the default 'change-me-instructor', change it next time)"
+    fi
     TARGET_PORT="$(ask 'Target port'  8080 TARGET_PORT)"
     CONSOLE_PORT="$(ask 'Console port' 8081 CONSOLE_PORT)"
     PUBLIC_HOST="$(ask 'Public IP to give students' "$DEF_IP" PUBLIC_HOST)"
-    export BIND_HOST="${BIND_HOST:-0.0.0.0}" TARGET_PORT CONSOLE_PORT PUBLIC_HOST
+    export BIND_HOST="${BIND_HOST:-0.0.0.0}" INSTRUCTOR_PASSWORD TARGET_PORT CONSOLE_PORT PUBLIC_HOST
     docker compose up --build -d
     echo
     echo "=============================================================="
