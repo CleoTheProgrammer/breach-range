@@ -53,18 +53,26 @@ function leaderboard() {
     $players = db()->query("SELECT id, handle FROM players")->fetchAll(PDO::FETCH_ASSOC);
     $rows = [];
     foreach ($players as $pl) {
-        $last = db()->prepare("SELECT GREATEST(COALESCE(MAX(flag_at),0), COALESCE(MAX(quiz_at),0)) FROM progress WHERE player_id = ?");
-        $last->execute([$pl['id']]);
+        $prog = progress_for($pl['id']);
+        $flags = 0; foreach ($prog as $r) { if ($r['flag']) $flags++; }
+        $lt = db()->prepare("SELECT MAX(GREATEST(COALESCE(flag_at,'1970-01-01 00:00:00'), COALESCE(quiz_at,'1970-01-01 00:00:00'))) FROM progress WHERE player_id = ?");
+        $lt->execute([$pl['id']]);
+        $last = $lt->fetchColumn();
         $rows[] = [
-            'handle' => $pl['handle'],
-            'points' => points_for($pl['id']),
-            'cleared'=> stage1_complete($pl['id']),
-            'last'   => $last->fetchColumn() ?: '0',
+            'handle'  => $pl['handle'],
+            'flags'   => $flags,
+            'points'  => points_for($pl['id']),
+            'cleared' => stage1_complete($pl['id']),
+            'last'    => ($last && $last > '1971') ? $last : '',
         ];
     }
+    // Rank: most flags first; ties to whoever reached it earliest (fastest); then points.
     usort($rows, function($a, $b) {
-        if ($a['points'] !== $b['points']) return $b['points'] - $a['points'];
-        return strcmp($a['last'], $b['last']);
+        if ($a['flags'] !== $b['flags']) return $b['flags'] - $a['flags'];
+        $al = $a['last'] !== '' ? $a['last'] : '9999';
+        $bl = $b['last'] !== '' ? $b['last'] : '9999';
+        if ($al !== $bl) return strcmp($al, $bl);
+        return $b['points'] - $a['points'];
     });
     return $rows;
 }

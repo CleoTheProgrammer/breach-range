@@ -23,7 +23,7 @@ require_once __DIR__ . '/includes/header.php'; ?>
     <div style="margin-top:22px;max-width:380px">
       <div style="color:#8aa0b4;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Enlist to begin</div>
       <form method="post" action="/auth.php">
-        <label>Operator handle</label><input name="handle" maxlength="40" required>
+        <label>Operator handle</label><input name="handle" maxlength="40" value="<?= htmlspecialchars($_SESSION['suggested_handle'] ?? '') ?>" required><?php unset($_SESSION['suggested_handle']); ?>
         <label>Passphrase</label><input name="password" type="password" required>
         <button class="btn" type="submit">Go</button>
       </form>
